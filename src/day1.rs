@@ -6,8 +6,7 @@ mod utils;
 extern crate test;
 use lazy_static::lazy_static;
 use std::{
-    intrinsics::{likely, unlikely},
-    thread::current,
+    intrinsics::{unlikely, likely},
 };
 
 lazy_static! {
@@ -16,14 +15,12 @@ lazy_static! {
 
 pub fn main() {
     let mut current_elf: u32 = 0;
-    // Keep a running list of the top 4, whereas the last element will be swapped by the latest elf.
-    let mut top4 = [0, 0, 0, 0];
+    let mut top3 = [0, 0, 0];
 
     for row in INPUT.split('\n') {
         if unlikely(row.is_empty()) {
-            top4[3] = current_elf;
-            sort4(&mut top4);
-            current_elf = 0;
+          insert_sort3(&mut top3, current_elf);
+          current_elf = 0;
         } else {
             let Ok(row_value) = row.parse::<u32>() else {
                 panic!("Failed to parse row: '{}'", row);
@@ -31,24 +28,27 @@ pub fn main() {
             current_elf += row_value;
         }
     }
-    println!("Max sum: {}", top4[0]);
-    println!("Max 3 sum: {}", top4[0] + top4[1] + top4[2]);
+    insert_sort3(&mut top3, current_elf);
+
+    println!("Max sum: {}", top3[0]);
+    println!("Max 3 sum: {}", top3.iter().sum::<u32>());
 }
 
-fn sort4<T: PartialOrd>(arr: &mut [T; 4]) {
-    cond_swap(arr, 0, 2);
-    cond_swap(arr, 1, 3);
-    cond_swap(arr, 0, 1);
-    cond_swap(arr, 2, 3);
-    cond_swap(arr, 1, 2);
-}
-
-#[inline]
-fn cond_swap<T: PartialOrd, const S: usize>(arr: &mut [T; S], x: usize, y: usize) {
-    // Branch prediction hint.
-    if likely(arr[x] < arr[y]) {
-        arr.swap(x, y);
+fn insert_sort3<T: PartialOrd + Copy>(arr: &mut [T; 3], newval: T) {
+  if likely(newval > arr[0]) {
+    if unlikely(newval > arr[1]) {
+      if unlikely(newval > arr[2]) {
+        arr[0] = arr[1];
+        arr[1] = arr[2];
+        arr[2] = newval;
+      } else {
+        arr[0] = arr[1];
+        arr[1] = newval;
+      }
+    } else {
+      arr[0] = newval;
     }
+  }
 }
 
 #[bench]
