@@ -5,7 +5,7 @@ mod utils;
 
 extern crate test;
 use lazy_static::lazy_static;
-use std::intrinsics::unlikely;
+use std::intrinsics::{unlikely, likely};
 
 lazy_static! {
     static ref INPUT: String = utils::get_puzzle_input(1);
@@ -46,7 +46,7 @@ pub fn main() {
 #[inline]
 fn cond_swap<T: PartialOrd, const S: usize>(arr: &mut [T; S], x: usize, y: usize) {
     // Branch prediction hint.
-    if unlikely(arr[x] > arr[y]) {
+    if likely(arr[x] > arr[y]) {
         arr.swap(x, y);
     }
 }
