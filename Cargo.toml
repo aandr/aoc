@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 reqwest = { version = "0.11", features = [ "blocking", "cookies" ] }
 lazy_static = "1.4.0"
-subtle = "2.4"
 
 [[bin]]
 name = "day1"

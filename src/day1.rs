@@ -1,10 +1,6 @@
 #![feature(test)]
-#![feature(slice_swap_unchecked)]
-
-use std::mem::swap;
 
 use lazy_static::lazy_static;
-use subtle::ConditionallySelectable;
 
 mod utils;
 
