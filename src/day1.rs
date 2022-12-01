@@ -1,4 +1,7 @@
 #![feature(test)]
+#![feature(core_intrinsics)]
+
+use std::intrinsics::unlikely;
 
 use lazy_static::lazy_static;
 
@@ -12,7 +15,7 @@ pub fn main() {
     let mut sums = vec![0];
 
     for row in INPUT.split('\n') {
-        if row.is_empty() {
+        if unlikely(row.is_empty()) {
             sums.push(0)
         } else {
             let Ok(row_value) = row.parse::<i32>() else {
@@ -41,7 +44,8 @@ pub fn main() {
 
 #[inline]
 fn cond_swap(arr: &mut [i32; 4], x: usize, y: usize) {
-  if arr[x] > arr[y] {
+  // Branch predidction hint.
+  if unlikely(arr[x] > arr[y]) {
     arr.swap(x, y);
   }
 }
