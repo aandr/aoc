@@ -1,14 +1,14 @@
 #![feature(test)]
 #![feature(core_intrinsics)]
 
-use std::intrinsics::unlikely;
-
-use lazy_static::lazy_static;
-
 mod utils;
 
+extern crate test;
+use lazy_static::lazy_static;
+use std::intrinsics::unlikely;
+
 lazy_static! {
-  static ref INPUT: String = utils::get_puzzle_input(1);
+    static ref INPUT: String = utils::get_puzzle_input(1);
 }
 
 pub fn main() {
@@ -18,7 +18,7 @@ pub fn main() {
         if unlikely(row.is_empty()) {
             sums.push(0)
         } else {
-            let Ok(row_value) = row.parse::<i32>() else {
+            let Ok(row_value) = row.parse::<u32>() else {
                 panic!("Failed to parse row: '{}'", row);
             };
             *sums.last_mut().unwrap() += row_value;
@@ -29,13 +29,13 @@ pub fn main() {
     let mut top4 = [0, 0, 0, 0];
 
     for sum in sums {
-      top4[0] = sum;
-      // Inspired by LLVM's sort4_branchless.
-      cond_swap(&mut top4, 0, 2);
-      cond_swap(&mut top4, 1, 3);
-      cond_swap(&mut top4, 0, 1);
-      cond_swap(&mut top4, 2, 3);
-      cond_swap(&mut top4, 1, 2);
+        top4[0] = sum;
+        // Inspired by LLVM's sort4_branchless.
+        cond_swap(&mut top4, 0, 2);
+        cond_swap(&mut top4, 1, 3);
+        cond_swap(&mut top4, 0, 1);
+        cond_swap(&mut top4, 2, 3);
+        cond_swap(&mut top4, 1, 2);
     }
 
     println!("Max sum: {}", top4[3]);
@@ -43,15 +43,14 @@ pub fn main() {
 }
 
 #[inline]
-fn cond_swap(arr: &mut [i32; 4], x: usize, y: usize) {
-  // Branch predidction hint.
-  if unlikely(arr[x] > arr[y]) {
-    arr.swap(x, y);
-  }
+fn cond_swap<T: PartialOrd, const S: usize>(arr: &mut [T; S], x: usize, y: usize) {
+    // Branch prediction hint.
+    if unlikely(arr[x] > arr[y]) {
+        arr.swap(x, y);
+    }
 }
 
-extern crate test;
 #[bench]
 fn day1_bench(b: &mut test::Bencher) {
-  b.iter(|| main());
+    b.iter(|| main());
 }
