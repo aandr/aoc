@@ -30,7 +30,8 @@ pub fn main() {
 
     for sum in sums {
         top4[0] = sum;
-        // Inspired by LLVM's sort4_branchless.
+        // Inspired by LLVM's sort4.
+        // Unfortunately branchless (ie swap with self) works slower than branched.
         cond_swap(&mut top4, 0, 2);
         cond_swap(&mut top4, 1, 3);
         cond_swap(&mut top4, 0, 1);
